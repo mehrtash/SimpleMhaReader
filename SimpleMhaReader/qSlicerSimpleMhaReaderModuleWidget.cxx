@@ -86,6 +86,8 @@ void qSlicerSimpleMhaReaderModuleWidget::setup()
   connect(d->previousInvalidFrameButton, SIGNAL(clicked()), this, SLOT(onPreviousInvalidFrame()));
   connect(d->nextInvalidFrameButton, SIGNAL(clicked()), this, SLOT(onNextInvalidFrame()));
   
+  connect(d->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(onFrameSliderChanged(int)));
+  
   qvtkConnect(d->logic(), vtkCommand::ModifiedEvent, this, SLOT(updateState()));
 }
 
@@ -103,9 +105,9 @@ void qSlicerSimpleMhaReaderModuleWidget::updateState()
   ostringstream oss;
   oss << logic->getCurrentFrame() << "/" << logic->getNumberOfFrames();
   d->currentFrameLabel->setText(oss.str().c_str());
-  
   d->transformStatusLabel->setText(logic->getCurrentTransformStatus().c_str());
-  
+  d->frameSlider->setMaximum(logic->getNumberOfFrames());
+  d->frameSlider->setValue(logic->getCurrentFrame());
 }
 
 SLOTDEF_0(onNextImage, nextImage);
@@ -114,4 +116,5 @@ SLOTDEF_0(onPreviousValidFrame, previousValidFrame);
 SLOTDEF_0(onNextValidFrame, nextValidFrame);
 SLOTDEF_0(onPreviousInvalidFrame, previousInvalidFrame);
 SLOTDEF_0(onNextInvalidFrame, nextInvalidFrame);
+SLOTDEF_1(int, onFrameSliderChanged, goToFrame)
 

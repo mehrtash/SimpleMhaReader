@@ -316,6 +316,7 @@ void vtkSlicerSimpleMhaReaderLogic::setMhaPath(string path)
     this->dataPointer = new unsigned char[iImgRows*iImgCols];
     readImageTransforms_mha(this->mhaPath, this->transforms, this->transformsValidity, this->filenames);
     this->updateImage();
+    this->Modified();
   }
 }
 
@@ -370,6 +371,17 @@ void vtkSlicerSimpleMhaReaderLogic::previousImage()
   this->currentFrame -= 1;
   if(this->currentFrame < 0)
     this->currentFrame = this->getNumberOfFrames()-1;
+  this->updateImage();
+  this->Modified();
+}
+
+void vtkSlicerSimpleMhaReaderLogic::goToFrame(int frame)
+{
+  this->currentFrame = frame;
+  if(this->currentFrame < 0)
+    this->currentFrame = this->getNumberOfFrames()-1;
+  else if(this->currentFrame >= this->getNumberOfFrames())
+    this->currentFrame = 0;
   this->updateImage();
   this->Modified();
 }

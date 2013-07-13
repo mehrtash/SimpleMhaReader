@@ -93,6 +93,7 @@ public:
   void updateImage();
   void nextImage();
   void nextValidFrame();
+  void goToFrame(int);
   void previousValidFrame();
   void nextInvalidFrame();
   void previousInvalidFrame();

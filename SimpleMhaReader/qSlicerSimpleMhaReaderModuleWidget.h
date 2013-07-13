@@ -40,6 +40,7 @@ public:
 
 public slots:
   void onFileChanged(const QString&);
+  void onFrameSliderChanged(int);
   void onNextImage();
   void onPreviousImage();
   void onNextValidFrame();
