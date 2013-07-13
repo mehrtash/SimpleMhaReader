@@ -178,8 +178,16 @@ void vtkSlicerSimpleMhaReaderLogic::readImage_mha()
     }
   } 
 
+  int nmax = (this->currentFrame+1)/this->maxFrameSeek;
+  int frame = this->currentFrame - this->maxFrameSeek*nmax;
+  for(int i=0; i<nmax; i++)
+  {
+    cout << "hello" << endl;
+    fseek(infile, this->imageHeight*this->imageWidth*this->maxFrameSeek, SEEK_CUR);
+  }
+  
   // Skip given number of frames and read the last frame
-  fseek(infile, this->imageHeight*this->imageWidth*this->currentFrame, SEEK_CUR);
+  fseek(infile, this->imageHeight*this->imageWidth*frame, SEEK_CUR);
   fread( this->dataPointer, 1, this->imageHeight*this->imageWidth, infile );
   fclose( infile );
 }
@@ -263,6 +271,8 @@ void vtkSlicerSimpleMhaReaderLogic::setMhaPath(string path)
     this->imageWidth = iImgCols;
     this->imageHeight = iImgRows;
     this->numberOfFrames = iImgCount;
+    this->maxFrameSeek = LONG_MAX / ((long int)this->imageWidth*(long int)this->imageHeight);
+    cout << LONG_MAX << " " << this->maxFrameSeek << " " << this->imageWidth*this->imageHeight << endl;
     if(this->dataPointer)
       delete [] this->dataPointer;
     this->dataPointer = new unsigned char[iImgRows*iImgCols];
