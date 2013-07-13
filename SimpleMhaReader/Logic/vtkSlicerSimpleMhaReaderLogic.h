@@ -81,8 +81,6 @@ private:
   int imageHeight;
   int currentFrame;
   int numberOfFrames;
-  // The max number of frames that can be seeked with fseek such that the number of bytes remains in the limit of LONG_MAX
-  int maxFrameSeek;
   
   
   // Private function
