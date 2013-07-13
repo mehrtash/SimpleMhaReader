@@ -106,6 +106,9 @@ void qSlicerSimpleMhaReaderModuleWidget::updateState()
   oss << logic->getCurrentFrame() << "/" << logic->getNumberOfFrames();
   d->currentFrameLabel->setText(oss.str().c_str());
   d->transformStatusLabel->setText(logic->getCurrentTransformStatus().c_str());
+  oss.clear(); oss.str("");
+  oss << logic->getImageWidth() << "x" << logic->getImageHeight();
+  d->imageDimensionsLabel->setText(oss.str().c_str());
   d->frameSlider->setMaximum(logic->getNumberOfFrames());
   d->frameSlider->setValue(logic->getCurrentFrame());
 }
