@@ -92,6 +92,10 @@ public:
   string getCurrentTransformStatus();
   void updateImage();
   void nextImage();
+  void nextValidFrame();
+  void previousValidFrame();
+  void nextInvalidFrame();
+  void previousInvalidFrame();
   void previousImage();
 };
 

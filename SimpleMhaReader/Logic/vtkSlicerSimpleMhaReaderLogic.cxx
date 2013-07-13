@@ -373,3 +373,63 @@ void vtkSlicerSimpleMhaReaderLogic::previousImage()
   this->updateImage();
   this->Modified();
 }
+
+void vtkSlicerSimpleMhaReaderLogic::nextValidFrame()
+{
+  int frame = 0;
+  for(int i=0; i<this->getNumberOfFrames(); i++)
+  {
+    frame = (this->currentFrame + i + 1)%this->getNumberOfFrames();
+    if(this->transformsValidity[frame])
+      break;
+  }
+  this->currentFrame = frame;
+  this->updateImage();
+  this->Modified();
+}
+
+void vtkSlicerSimpleMhaReaderLogic::previousValidFrame()
+{
+  int frame = 0;
+  for(int i=0; i<this->getNumberOfFrames(); i++)
+  {
+    frame = this->currentFrame-i-1;
+    if(frame < 0)
+      frame = this->getNumberOfFrames() + frame;
+    if(this->transformsValidity[frame])
+      break;
+  }
+  this->currentFrame = frame;
+  this->updateImage();
+  this->Modified();
+}
+
+void vtkSlicerSimpleMhaReaderLogic::nextInvalidFrame()
+{
+  int frame = 0;
+  for(int i=0; i<this->getNumberOfFrames(); i++)
+  {
+    frame = (this->currentFrame + i + 1)%this->getNumberOfFrames();
+    if(!this->transformsValidity[frame])
+      break;
+  }
+  this->currentFrame = frame;
+  this->updateImage();
+  this->Modified();
+}
+
+void vtkSlicerSimpleMhaReaderLogic::previousInvalidFrame()
+{
+  int frame = 0;
+  for(int i=0; i<this->getNumberOfFrames(); i++)
+  {
+    frame = this->currentFrame-i-1;
+    if(frame < 0)
+      frame = this->getNumberOfFrames() + frame;
+    if(!this->transformsValidity[frame])
+      break;
+  }
+  this->currentFrame = frame;
+  this->updateImage();
+  this->Modified();
+}

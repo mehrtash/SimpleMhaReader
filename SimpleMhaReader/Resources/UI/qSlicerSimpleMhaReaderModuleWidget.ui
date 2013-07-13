@@ -70,14 +70,50 @@
      <item>
       <widget class="QPushButton" name="previousPushButton">
        <property name="text">
-        <string>Previous</string>
+        <string>Previous Frame</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="nextPushButton">
        <property name="text">
-        <string>Next</string>
+        <string>Next Frame</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="previousValidFrameButton">
+       <property name="text">
+        <string>Previous Valid Frame</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="nextValidFrameButton">
+       <property name="text">
+        <string>Next Valid Frame</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QPushButton" name="previousInvalidFrameButton">
+       <property name="text">
+        <string>Previous Invalid Frame</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="nextInvalidFrameButton">
+       <property name="text">
+        <string>Next Invalid Frame</string>
        </property>
       </widget>
      </item>

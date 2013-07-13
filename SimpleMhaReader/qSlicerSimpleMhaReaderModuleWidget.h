@@ -42,6 +42,10 @@ public slots:
   void onFileChanged(const QString&);
   void onNextImage();
   void onPreviousImage();
+  void onNextValidFrame();
+  void onPreviousValidFrame();
+  void onNextInvalidFrame();
+  void onPreviousInvalidFrame();
   void updateState();
 
 protected:

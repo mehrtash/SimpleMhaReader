@@ -81,6 +81,11 @@ void qSlicerSimpleMhaReaderModuleWidget::setup()
   connect(d->nextPushButton, SIGNAL(clicked()), this, SLOT(onNextImage()));
   connect(d->previousPushButton, SIGNAL(clicked()), this, SLOT(onPreviousImage()));
   
+  connect(d->previousValidFrameButton, SIGNAL(clicked()), this, SLOT(onPreviousValidFrame()));
+  connect(d->nextValidFrameButton, SIGNAL(clicked()), this, SLOT(onNextValidFrame()));
+  connect(d->previousInvalidFrameButton, SIGNAL(clicked()), this, SLOT(onPreviousInvalidFrame()));
+  connect(d->nextInvalidFrameButton, SIGNAL(clicked()), this, SLOT(onNextInvalidFrame()));
+  
   qvtkConnect(d->logic(), vtkCommand::ModifiedEvent, this, SLOT(updateState()));
 }
 
@@ -104,5 +109,9 @@ void qSlicerSimpleMhaReaderModuleWidget::updateState()
 }
 
 SLOTDEF_0(onNextImage, nextImage);
-SLOTDEF_0(onPreviousImage, previousImage)
+SLOTDEF_0(onPreviousImage, previousImage);
+SLOTDEF_0(onPreviousValidFrame, previousValidFrame);
+SLOTDEF_0(onNextValidFrame, nextValidFrame);
+SLOTDEF_0(onPreviousInvalidFrame, previousInvalidFrame);
+SLOTDEF_0(onNextInvalidFrame, nextInvalidFrame);
 
