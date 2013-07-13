@@ -80,15 +80,22 @@ private:
   int imageWidth;
   int imageHeight;
   int currentFrame;
+  int numberOfFrames;
   
+  
+  // Private function
+  void checkFrame();
 public:
+  // Read image logic
+  void readImage_mha();
+  
   // Getters and Setters
   GET(string, mhaPath, MhaPath);
   GET(int, imageWidth, ImageWidth);
   GET(int, imageHeight, ImageHeight);
   GET(int, currentFrame, CurrentFrame);
+  GET(int, numberOfFrames, NumberOfFrames);
   void setMhaPath(string path);
-  int getNumberOfFrames();
   string getCurrentTransformStatus();
   void updateImage();
   void nextImage();

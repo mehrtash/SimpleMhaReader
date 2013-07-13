@@ -162,62 +162,13 @@ void readImageTransforms_mha(const std::string& filename, std::vector<std::vecto
   }
 }
 
-void readImage_mha(const std::string& filename, int& firstFrame, int& lastFrame)
+void vtkSlicerSimpleMhaReaderLogic::readImage_mha()
 {
-  int iImgCols = -1;
-  int iImgRows = -1;
-  int iImgCount = -1;
-  if(readImageDimensions_mha(filename, iImgCols, iImgRows, iImgCount))
-    return;
 
-  FILE *infile = fopen( filename.c_str(), "rb" );
+  FILE *infile = fopen( this->mhaPath.c_str(), "rb" );
   char buffer[400];
-  while( fgets( buffer, 400, infile ) )
-  {
-    if( strstr( buffer, "ElementDataFile = LOCAL" ) )
-    {
-       // Done reading
-      break;
-    }
-  }
-
-  unsigned char *pucImgData = new unsigned char[iImgRows*iImgCols];
-
-  if(firstFrame < 0)
-    firstFrame = 0;
-  if(firstFrame >= iImgCount)
-    firstFrame = iImgCount-1;
-  if(lastFrame < 0 || lastFrame >= iImgCount)
-    lastFrame = iImgCount-1;
-  if(firstFrame > lastFrame)
-    firstFrame = lastFrame;
-   // Read & write images
-  void *ptr = NULL;
-  for( int i = 0; i < iImgCount; i++ )
-  {
-    if(i<firstFrame)
-      fseek(infile, iImgRows*iImgCols, SEEK_CUR);
-    else if(i>=firstFrame && i <= lastFrame) {
-      fread( pucImgData, 1, iImgRows*iImgCols, infile );
-    }
-    else if(i>lastFrame)
-      break;
-  }
-  delete [] pucImgData;
-
-  fclose( infile );
-}
-
-void readImage_mha(const string& filename, int& frame, vtkImageData* data, void* dataPointer)
-{
-  int iImgCols = -1;
-  int iImgRows = -1;
-  int iImgCount = -1;
-  if(readImageDimensions_mha(filename, iImgCols, iImgRows, iImgCount))
-    return;
-
-  FILE *infile = fopen( filename.c_str(), "rb" );
-  char buffer[400];
+  
+  // Just move the pointer where data starts
   while( fgets( buffer, 400, infile ) )
   {
     if( strstr( buffer, "ElementDataFile = LOCAL" ) )
@@ -227,14 +178,9 @@ void readImage_mha(const string& filename, int& frame, vtkImageData* data, void*
     }
   } 
 
-  if(frame < 0)
-    frame = iImgCount-1;
-  if(frame >= iImgCount)
-    frame = iImgCount-1;
-
-  fseek(infile, iImgRows*iImgCols*frame, SEEK_CUR);
-  fread( dataPointer, 1, iImgRows*iImgCols, infile );
-
+  // Skip given number of frames and read the last frame
+  fseek(infile, this->imageHeight*this->imageWidth*this->currentFrame, SEEK_CUR);
+  fread( this->dataPointer, 1, this->imageHeight*this->imageWidth, infile );
   fclose( infile );
 }
 
@@ -250,6 +196,9 @@ vtkSlicerSimpleMhaReaderLogic::vtkSlicerSimpleMhaReaderLogic()
   this->dataPointer = NULL;
   this->imageNode = vtkMRMLScalarVolumeNode::New();
   this->imageNode->SetName("mha image");
+  this->imageWidth = 0;
+  this->imageHeight = 0;
+  this->numberOfFrames = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -311,6 +260,9 @@ void vtkSlicerSimpleMhaReaderLogic::setMhaPath(string path)
     int iImgCount = -1;
     if(readImageDimensions_mha(this->mhaPath, iImgCols, iImgRows, iImgCount))
       return;
+    this->imageWidth = iImgCols;
+    this->imageHeight = iImgRows;
+    this->numberOfFrames = iImgCount;
     if(this->dataPointer)
       delete [] this->dataPointer;
     this->dataPointer = new unsigned char[iImgRows*iImgCols];
@@ -320,10 +272,6 @@ void vtkSlicerSimpleMhaReaderLogic::setMhaPath(string path)
   }
 }
 
-int vtkSlicerSimpleMhaReaderLogic::getNumberOfFrames()
-{
-  return this->transformsValidity.size();
-}
 
 string vtkSlicerSimpleMhaReaderLogic::getCurrentTransformStatus()
 {
@@ -335,15 +283,12 @@ string vtkSlicerSimpleMhaReaderLogic::getCurrentTransformStatus()
 
 void vtkSlicerSimpleMhaReaderLogic::updateImage()
 {
-  int iImgCols = -1;
-  int iImgRows = -1;
-  int iImgCount = -1;
-  readImageDimensions_mha(this->mhaPath, iImgCols, iImgRows, iImgCount);
-  readImage_mha(this->mhaPath, this->currentFrame, this->imgData, this->dataPointer);
+  checkFrame();
+  readImage_mha();
   vtkSmartPointer<vtkImageImport> importer = vtkSmartPointer<vtkImageImport>::New();
   importer->SetDataScalarTypeToUnsignedChar();
   importer->SetImportVoidPointer(dataPointer,1); // Save argument to 1 won't destroy the pointer when importer destroyed
-  importer->SetWholeExtent(0,iImgCols-1,0, iImgRows-1, 0, 0);
+  importer->SetWholeExtent(0,this->imageWidth-1,0, this->imageHeight-1, 0, 0);
   importer->SetDataExtentToWholeExtent();
   importer->Update();
   this->imgData = importer->GetOutput();
@@ -360,8 +305,6 @@ void vtkSlicerSimpleMhaReaderLogic::updateImage()
 void vtkSlicerSimpleMhaReaderLogic::nextImage()
 {
   this->currentFrame += 1;
-  if(this->currentFrame >= this->getNumberOfFrames())
-    this->currentFrame = 0;
   this->updateImage();
   this->Modified();
 }
@@ -369,8 +312,6 @@ void vtkSlicerSimpleMhaReaderLogic::nextImage()
 void vtkSlicerSimpleMhaReaderLogic::previousImage()
 {
   this->currentFrame -= 1;
-  if(this->currentFrame < 0)
-    this->currentFrame = this->getNumberOfFrames()-1;
   this->updateImage();
   this->Modified();
 }
@@ -378,10 +319,6 @@ void vtkSlicerSimpleMhaReaderLogic::previousImage()
 void vtkSlicerSimpleMhaReaderLogic::goToFrame(int frame)
 {
   this->currentFrame = frame;
-  if(this->currentFrame < 0)
-    this->currentFrame = this->getNumberOfFrames()-1;
-  else if(this->currentFrame >= this->getNumberOfFrames())
-    this->currentFrame = 0;
   this->updateImage();
   this->Modified();
 }
@@ -444,4 +381,12 @@ void vtkSlicerSimpleMhaReaderLogic::previousInvalidFrame()
   this->currentFrame = frame;
   this->updateImage();
   this->Modified();
+}
+
+void vtkSlicerSimpleMhaReaderLogic::checkFrame()
+{
+  if(this->currentFrame >= this->numberOfFrames)
+    this->currentFrame = 0;
+  if(this->currentFrame < 0)
+    this->currentFrame = this->getNumberOfFrames()-1;
 }
