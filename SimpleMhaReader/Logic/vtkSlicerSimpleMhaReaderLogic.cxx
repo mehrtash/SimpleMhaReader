@@ -98,7 +98,7 @@ int readImageDimensions_mha(const std::string& filename, int& cols, int& rows, i
   return 1;
 }
 
-void readImageTransforms_mha(const std::string& filename, std::vector<std::vector<float> >& transforms, std::vector<bool>& transformsValidity, std::vector<std::string>& filenames)
+void readImageTransforms_mha(const std::string& filename, std::vector<std::vector<float> >& transforms, set<string>& availableTransforms,  std::vector<bool>& transformsValidity, std::vector<std::string>& filenames)
 {
   std::string dirName = getDir(filename);
   filenames.clear();
@@ -120,6 +120,13 @@ void readImageTransforms_mha(const std::string& filename, std::vector<std::vecto
     char *pch = &(str[0]);
     if( !pch )
       return;
+      
+    if(strstr(pch, "Seq_Frame") && strstr(pch, "Transform")){
+      char* transformName = strstr(pch, "Seq_Frame")+string("Seq_Frame").size()+5;
+      char* endTransformName = strstr(pch, "Transform");
+      std::string transformNameCpy = string(transformName, endTransformName-transformName);
+      availableTransforms.insert(transformNameCpy);
+    }
 
     if( strstr( pch, "ProbeToTrackerTransform =" )
       || strstr( pch, "UltrasoundToTrackerTransform =" ) )
@@ -160,6 +167,8 @@ void readImageTransforms_mha(const std::string& filename, std::vector<std::vecto
       break;
     }
   }
+  for(set<string>::iterator it=availableTransforms.begin(); it!=availableTransforms.end(); it++)
+    cout << *it << endl;
 }
 
 void vtkSlicerSimpleMhaReaderLogic::readImage_mha()
@@ -270,7 +279,7 @@ void vtkSlicerSimpleMhaReaderLogic::setMhaPath(string path)
     if(this->dataPointer)
       delete [] this->dataPointer;
     this->dataPointer = new unsigned char[iImgRows*iImgCols];
-    readImageTransforms_mha(this->mhaPath, this->transforms, this->transformsValidity, this->filenames);
+    readImageTransforms_mha(this->mhaPath, this->transforms, this->availableTransforms, this->transformsValidity, this->filenames);
     this->updateImage();
     this->Modified();
   }

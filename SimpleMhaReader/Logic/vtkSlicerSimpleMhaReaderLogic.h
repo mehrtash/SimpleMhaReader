@@ -33,6 +33,7 @@
 // STD includes
 #include <cstdlib>
 #include <stdio.h>
+#include <set>
 
 // VTK includes
 #include <vtkImageData.h>
@@ -73,6 +74,7 @@ private:
   vector<vector<float> > transforms;
   vector<string> filenames;
   vector<bool> transformsValidity;
+  set<string> availableTransforms;
   
   vtkSmartPointer<vtkImageData> imgData;
   unsigned char* dataPointer;
@@ -95,6 +97,7 @@ public:
   GET(int, imageHeight, ImageHeight);
   GET(int, currentFrame, CurrentFrame);
   GET(int, numberOfFrames, NumberOfFrames);
+  GET(set<string>, availableTransforms, AvailableTransforms);
   void setMhaPath(string path);
   string getCurrentTransformStatus();
   void updateImage();

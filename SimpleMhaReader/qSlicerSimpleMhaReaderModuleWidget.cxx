@@ -24,6 +24,9 @@
 
 #include "vtkSlicerSimpleMhaReaderLogic.h"
 
+// STL includes
+#include <set>
+
 //-----------------------------------------------------------------------------
 /// \ingroup Slicer_QtModules_ExtensionTemplate
 class qSlicerSimpleMhaReaderModuleWidgetPrivate: public Ui_qSlicerSimpleMhaReaderModuleWidget
@@ -111,6 +114,13 @@ void qSlicerSimpleMhaReaderModuleWidget::updateState()
   d->imageDimensionsLabel->setText(oss.str().c_str());
   d->frameSlider->setMaximum(logic->getNumberOfFrames());
   d->frameSlider->setValue(logic->getCurrentFrame());
+  std::set<std::string> availableTransforms = logic->getAvailableTransforms();
+  std::string avTransText;
+  for(std::set<std::string>::iterator it=availableTransforms.begin(); it!=availableTransforms.end(); it++)
+  {
+    avTransText+=*it + ", ";
+  }
+  d->availableTransformsLabel->setText(avTransText.c_str());
 }
 
 SLOTDEF_0(onNextImage, nextImage);

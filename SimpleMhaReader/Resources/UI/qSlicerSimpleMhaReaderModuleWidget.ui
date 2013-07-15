@@ -46,14 +46,14 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
+     <item row="4" column="0">
       <widget class="QLabel" name="label_0">
        <property name="text">
         <string>Transform Status: </string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
+     <item row="4" column="1">
       <widget class="QLabel" name="transformStatusLabel">
        <property name="text">
         <string>Unknown</string>
@@ -71,6 +71,20 @@
       <widget class="QLabel" name="imageDimensionsLabel">
        <property name="text">
         <string>0x0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Available Transforms: </string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="availableTransformsLabel">
+       <property name="text">
+        <string>No Transforms</string>
        </property>
       </widget>
      </item>
