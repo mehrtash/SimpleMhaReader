@@ -173,10 +173,19 @@ void readImageTransforms_mha(const std::string& filename, std::vector<std::vecto
 
 void vtkSlicerSimpleMhaReaderLogic::readImage_mha()
 {
-
+  this->console->insertPlainText("hello\n");
+  ostringstream oss;
+  clock_t beginTime = clock();
+  
   FILE *infile = fopen( this->mhaPath.c_str(), "rb" );
   char buffer[400];
   
+  clock_t endTime = clock();
+  double intervalInMiliSeconds = (endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
+  oss << "(1): " << intervalInMiliSeconds << endl;
+  this->console->insertPlainText(oss.str().c_str());
+  oss.clear(); oss.str("");
+  beginTime = endTime;
   // Just move the pointer where data starts
   while( fgets( buffer, 400, infile ) )
   {
@@ -187,14 +196,31 @@ void vtkSlicerSimpleMhaReaderLogic::readImage_mha()
     }
   } 
 
+  intervalInMiliSeconds = (endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
+  beginTime = endTime;
+  oss << "(2): " << intervalInMiliSeconds << endl;
+  this->console->insertPlainText(oss.str().c_str());
+  oss.clear(); oss.str("");
+  
   #ifdef WIN32
   _fseeki64(infile, (__int64)this->imageHeight*(__int64)this->imageWidth*(__int64)this->currentFrame, SEEK_CUR);
   #else
   fseek(infile, (long int)this->imageHeight*(long int)this->imageWidth*(long int)this->currentFrame, SEEK_CUR);
   #endif
 
+  intervalInMiliSeconds = (endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
+  beginTime = endTime;
+  oss << "(3): " << intervalInMiliSeconds << endl;
+  this->console->insertPlainText(oss.str().c_str());
+  oss.clear(); oss.str("");
+  
   fread( this->dataPointer, 1, this->imageHeight*this->imageWidth, infile );
   fclose( infile );
+  intervalInMiliSeconds = (endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
+  beginTime = endTime;
+  oss << "(4): " << intervalInMiliSeconds << endl;
+  this->console->insertPlainText(oss.str().c_str());
+  oss.clear(); oss.str("");
 }
 
 
@@ -262,6 +288,7 @@ void vtkSlicerSimpleMhaReaderLogic
 
 void vtkSlicerSimpleMhaReaderLogic::setMhaPath(string path)
 {
+  this->console->insertPlainText("red\n");
   if(path != this->mhaPath){
     this->mhaPath = path;
     this->transforms.clear();
@@ -296,6 +323,7 @@ string vtkSlicerSimpleMhaReaderLogic::getCurrentTransformStatus()
 
 void vtkSlicerSimpleMhaReaderLogic::updateImage()
 {
+  this->console->insertPlainText("green\n");
   checkFrame();
   readImage_mha();
   vtkSmartPointer<vtkImageImport> importer = vtkSmartPointer<vtkImageImport>::New();

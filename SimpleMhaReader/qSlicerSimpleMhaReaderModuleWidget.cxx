@@ -91,6 +91,8 @@ void qSlicerSimpleMhaReaderModuleWidget::setup()
   
   connect(d->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(onFrameSliderChanged(int)));
   
+  d->logic()->setConsole(d->consoleTextEdit);
+  
   qvtkConnect(d->logic(), vtkCommand::ModifiedEvent, this, SLOT(updateState()));
 }
 
@@ -112,8 +114,10 @@ void qSlicerSimpleMhaReaderModuleWidget::updateState()
   oss.clear(); oss.str("");
   oss << logic->getImageWidth() << "x" << logic->getImageHeight();
   d->imageDimensionsLabel->setText(oss.str().c_str());
+  d->frameSlider->blockSignals(true);
   d->frameSlider->setMaximum(logic->getNumberOfFrames());
   d->frameSlider->setValue(logic->getCurrentFrame());
+  d->frameSlider->blockSignals(false);
   std::set<std::string> availableTransforms = logic->getAvailableTransforms();
   std::string avTransText;
   for(std::set<std::string>::iterator it=availableTransforms.begin(); it!=availableTransforms.end(); it++)
@@ -123,7 +127,14 @@ void qSlicerSimpleMhaReaderModuleWidget::updateState()
   d->availableTransformsLabel->setText(avTransText.c_str());
 }
 
-SLOTDEF_0(onNextImage, nextImage);
+// SLOTDEF_0(onNextImage, nextImage);
+
+void qSlicerSimpleMhaReaderModuleWidget::onNextImage(){
+  Q_D(qSlicerSimpleMhaReaderModuleWidget);
+  d->consoleTextEdit->insertPlainText("blue\n");
+  d->logic()->nextImage();
+}
+
 SLOTDEF_0(onPreviousImage, previousImage);
 SLOTDEF_0(onPreviousValidFrame, previousValidFrame);
 SLOTDEF_0(onNextValidFrame, nextValidFrame);

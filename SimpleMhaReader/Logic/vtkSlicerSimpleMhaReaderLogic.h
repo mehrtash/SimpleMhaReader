@@ -38,6 +38,9 @@
 // VTK includes
 #include <vtkImageData.h>
 
+// QT includes
+#include <QTextEdit>
+
 #include "vtkSlicerSimpleMhaReaderModuleLogicExport.h"
 
 #include "util_macros.h"
@@ -84,6 +87,8 @@ private:
   int currentFrame;
   int numberOfFrames;
   
+  QTextEdit* console;
+  
   
   // Private function
   void checkFrame();
@@ -98,6 +103,7 @@ public:
   GET(int, currentFrame, CurrentFrame);
   GET(int, numberOfFrames, NumberOfFrames);
   GET(set<string>, availableTransforms, AvailableTransforms);
+  GETSET(QTextEdit*, console, Console);
   void setMhaPath(string path);
   string getCurrentTransformStatus();
   void updateImage();
