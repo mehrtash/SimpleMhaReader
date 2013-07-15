@@ -26,6 +26,7 @@ limitations under the License.
 
 // STD includes
 #include <cassert>
+#include <ctime>
 
 // =======================================================
 // Reading functions
