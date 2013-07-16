@@ -104,7 +104,33 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="applyTransformsCheckBox">
+     <property name="text">
+      <string>Apply Transforms</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QComboBox" name="playModeComboBox">
+       <item>
+        <property name="text">
+         <string>Forwards</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Backwards</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Random</string>
+        </property>
+       </item>
+      </widget>
+     </item>
      <item>
       <widget class="QPushButton" name="playPushButton">
        <property name="text">

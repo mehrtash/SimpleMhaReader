@@ -94,8 +94,9 @@ void qSlicerSimpleMhaReaderModuleWidget::setup()
   connect(d->previousInvalidFrameButton, SIGNAL(clicked()), this, SLOT(onPreviousInvalidFrame()));
   connect(d->nextInvalidFrameButton, SIGNAL(clicked()), this, SLOT(onNextInvalidFrame()));
   connect(d->playPushButton, SIGNAL(clicked()), this, SLOT(onPlayToggle()));
-  connect(d->timer, SIGNAL(timeout()), this, SLOT(onNextImage()));
+  connect(d->timer, SIGNAL(timeout()), this, SLOT(onPlayNext()));
   connect(d->playIntervalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onPlayIntervalChanged(int)));
+  connect(d->playModeComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(onPlayModeChanged(const QString&)));
   
   connect(d->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(onFrameSliderChanged(int)));
   
@@ -161,10 +162,16 @@ void qSlicerSimpleMhaReaderModuleWidget::onPlayIntervalChanged(int value)
   d->timer->setInterval(value);
 }
 
+void qSlicerSimpleMhaReaderModuleWidget::onPlayModeChanged(const QString& text){
+  Q_D(qSlicerSimpleMhaReaderModuleWidget);
+  d->logic()->setPlayMode(text.toStdString());
+}
+
 SLOTDEF_0(onPreviousImage, previousImage);
 SLOTDEF_0(onPreviousValidFrame, previousValidFrame);
 SLOTDEF_0(onNextValidFrame, nextValidFrame);
 SLOTDEF_0(onPreviousInvalidFrame, previousInvalidFrame);
 SLOTDEF_0(onNextInvalidFrame, nextInvalidFrame);
-SLOTDEF_1(int, onFrameSliderChanged, goToFrame)
+SLOTDEF_0(onPlayNext, playNext);
+SLOTDEF_1(int, onFrameSliderChanged, goToFrame);
 

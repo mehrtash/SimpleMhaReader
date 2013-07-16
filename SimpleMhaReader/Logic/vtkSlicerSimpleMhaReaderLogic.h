@@ -86,6 +86,8 @@ private:
   int imageHeight;
   int currentFrame;
   int numberOfFrames;
+  bool transformOption;
+  string playMode;
   
   QTextEdit* console;
   
@@ -104,6 +106,7 @@ public:
   GET(int, numberOfFrames, NumberOfFrames);
   GET(set<string>, availableTransforms, AvailableTransforms);
   GETSET(QTextEdit*, console, Console);
+  GETSET(string, playMode, PlayMode);
   void setMhaPath(string path);
   string getCurrentTransformStatus();
   void updateImage();
@@ -113,7 +116,9 @@ public:
   void previousValidFrame();
   void nextInvalidFrame();
   void previousInvalidFrame();
+  void randomFrame();
   void previousImage();
+  void playNext();
 };
 
 #endif

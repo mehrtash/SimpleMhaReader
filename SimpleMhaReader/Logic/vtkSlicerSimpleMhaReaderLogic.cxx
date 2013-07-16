@@ -214,6 +214,8 @@ vtkSlicerSimpleMhaReaderLogic::vtkSlicerSimpleMhaReaderLogic()
   this->imageWidth = 0;
   this->imageHeight = 0;
   this->numberOfFrames = 0;
+  this->transformOption = false;
+  this->playMode = "Forwards";
 }
 
 //----------------------------------------------------------------------------
@@ -299,11 +301,11 @@ string vtkSlicerSimpleMhaReaderLogic::getCurrentTransformStatus()
 
 void vtkSlicerSimpleMhaReaderLogic::updateImage()
 {
-  ostringstream oss;
-  this->console->insertPlainText("green\n");
   checkFrame();
-
+  
+  ostringstream oss;
   clock_t beginTime = clock();
+
   readImage_mha();
 
   clock_t endTime = clock();
@@ -433,10 +435,29 @@ void vtkSlicerSimpleMhaReaderLogic::previousInvalidFrame()
   this->Modified();
 }
 
+void vtkSlicerSimpleMhaReaderLogic::randomFrame()
+{
+  this->currentFrame = rand()%this->getNumberOfFrames();
+  this->updateImage();
+  this->Modified();
+}
+
 void vtkSlicerSimpleMhaReaderLogic::checkFrame()
 {
   if(this->currentFrame >= this->numberOfFrames)
     this->currentFrame = 0;
   if(this->currentFrame < 0)
     this->currentFrame = this->getNumberOfFrames()-1;
+}
+
+
+void vtkSlicerSimpleMhaReaderLogic::playNext()
+{
+  cout << this->playMode;
+  if(this->playMode == "Forwards")
+    this->nextImage();
+  else if(this->playMode == "Backwards")
+    this->previousImage();
+  else if(this->playMode == "Random")
+    this->randomFrame();
 }
