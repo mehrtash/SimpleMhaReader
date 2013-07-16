@@ -171,8 +171,10 @@ void qSlicerSimpleMhaReaderModuleWidget::onApplyTransformsChanged(int state){
   Q_D(qSlicerSimpleMhaReaderModuleWidget);
   if(state == Qt::Checked)
     d->logic()->setApplyTransforms(true);
-  else if(state == Qt::Unchecked)
+  else if(state == Qt::Unchecked){
+    d->logic()->setTransformToIdentity();
     d->logic()->setApplyTransforms(false);
+  }
 }
 
 SLOTDEF_0(onPreviousImage, previousImage);

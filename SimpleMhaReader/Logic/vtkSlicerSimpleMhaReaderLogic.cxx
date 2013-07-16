@@ -410,7 +410,7 @@ void vtkSlicerSimpleMhaReaderLogic::updateImage()
   readImage_mha();
 
   clock_t endTime = clock();
-  double intervalInMiliSeconds = (double)(endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
+  double intervalInMiliSeconds = (double)(endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000.;
   oss << "Reading took: " << intervalInMiliSeconds << " ms" << endl;
   this->console->insertPlainText(oss.str().c_str());
   oss.clear(); oss.str("");
@@ -437,7 +437,7 @@ void vtkSlicerSimpleMhaReaderLogic::updateImage()
   }
 
   endTime = clock();
-  intervalInMiliSeconds = (double)(endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
+  intervalInMiliSeconds = (double)(endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000.;
   oss << "Importing to vtk took : " << intervalInMiliSeconds << " ms" << endl;
   this->console->insertPlainText(oss.str().c_str());
   oss.clear(); oss.str("");
@@ -450,7 +450,7 @@ void vtkSlicerSimpleMhaReaderLogic::updateImage()
   }
   
   endTime = clock();
-  intervalInMiliSeconds = (double)(endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
+  intervalInMiliSeconds = (double)(endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000.;
   oss << "Setting node's data took: " << intervalInMiliSeconds << " ms" << endl;
   this->console->insertPlainText(oss.str().c_str());
   oss.clear(); oss.str("");
@@ -563,4 +563,14 @@ void vtkSlicerSimpleMhaReaderLogic::playNext()
     this->previousImage();
   else if(this->playMode == "Random")
     this->randomFrame();
+}
+
+void vtkSlicerSimpleMhaReaderLogic::setTransformToIdentity()
+{
+  if(this->imageNode)
+  {
+    vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
+    matrix->Identity();
+    this->imageNode->SetIJKToRASMatrix(matrix);
+  }
 }

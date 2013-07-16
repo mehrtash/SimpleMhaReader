@@ -99,6 +99,7 @@ private:
 public:
   // Read image logic
   void readImage_mha();
+  void setTransformToIdentity();
   
   // Getters and Setters
   GET(string, mhaPath, MhaPath);
