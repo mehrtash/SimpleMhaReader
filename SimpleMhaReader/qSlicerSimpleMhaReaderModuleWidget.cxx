@@ -17,6 +17,7 @@
 
 // Qt includes
 #include <QDebug>
+#include <QTimer>
 
 // SlicerQt includes
 #include "qSlicerSimpleMhaReaderModuleWidget.h"
@@ -34,6 +35,7 @@ class qSlicerSimpleMhaReaderModuleWidgetPrivate: public Ui_qSlicerSimpleMhaReade
   Q_DECLARE_PUBLIC(qSlicerSimpleMhaReaderModuleWidget)
 protected:
   qSlicerSimpleMhaReaderModuleWidget* const q_ptr;
+  QTimer* timer;
 public:
   ~qSlicerSimpleMhaReaderModuleWidgetPrivate();
   qSlicerSimpleMhaReaderModuleWidgetPrivate(qSlicerSimpleMhaReaderModuleWidget& object);
@@ -46,10 +48,13 @@ public:
 //-----------------------------------------------------------------------------
 qSlicerSimpleMhaReaderModuleWidgetPrivate::~qSlicerSimpleMhaReaderModuleWidgetPrivate()
 {
+  delete timer;
 }
 
 qSlicerSimpleMhaReaderModuleWidgetPrivate::qSlicerSimpleMhaReaderModuleWidgetPrivate(qSlicerSimpleMhaReaderModuleWidget& object): q_ptr(&object)
 {
+  timer = new QTimer;
+  timer->setInterval(100);
 }
 
 vtkSlicerSimpleMhaReaderLogic* qSlicerSimpleMhaReaderModuleWidgetPrivate::logic() const
@@ -88,6 +93,9 @@ void qSlicerSimpleMhaReaderModuleWidget::setup()
   connect(d->nextValidFrameButton, SIGNAL(clicked()), this, SLOT(onNextValidFrame()));
   connect(d->previousInvalidFrameButton, SIGNAL(clicked()), this, SLOT(onPreviousInvalidFrame()));
   connect(d->nextInvalidFrameButton, SIGNAL(clicked()), this, SLOT(onNextInvalidFrame()));
+  connect(d->playPushButton, SIGNAL(clicked()), this, SLOT(onPlayToggle()));
+  connect(d->timer, SIGNAL(timeout()), this, SLOT(onNextImage()));
+  connect(d->playIntervalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onPlayIntervalChanged(int)));
   
   connect(d->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(onFrameSliderChanged(int)));
   
@@ -133,6 +141,24 @@ void qSlicerSimpleMhaReaderModuleWidget::onNextImage(){
   Q_D(qSlicerSimpleMhaReaderModuleWidget);
   d->consoleTextEdit->insertPlainText("blue\n");
   d->logic()->nextImage();
+}
+
+void qSlicerSimpleMhaReaderModuleWidget::onPlayToggle() {
+  Q_D(qSlicerSimpleMhaReaderModuleWidget);
+  if(d->timer->isActive()){
+    d->playPushButton->setText(QString("Start Playing"));
+    d->timer->stop();
+  }
+  else {
+    d->playPushButton->setText(QString("Stop Playing"));
+    d->timer->start();
+  }
+}
+
+void qSlicerSimpleMhaReaderModuleWidget::onPlayIntervalChanged(int value)
+{
+  Q_D(qSlicerSimpleMhaReaderModuleWidget);
+  d->timer->setInterval(value);
 }
 
 SLOTDEF_0(onPreviousImage, previousImage);

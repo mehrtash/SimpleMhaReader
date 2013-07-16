@@ -48,6 +48,8 @@ public slots:
   void onNextInvalidFrame();
   void onPreviousInvalidFrame();
   void updateState();
+  void onPlayIntervalChanged(int);
+  void onPlayToggle();
 
 protected:
   QScopedPointer<qSlicerSimpleMhaReaderModuleWidgetPrivate> d_ptr;
