@@ -37,6 +37,7 @@
 
 // VTK includes
 #include <vtkImageData.h>
+#include <vtkMatrix4x4.h>
 
 // QT includes
 #include <QTextEdit>
@@ -79,6 +80,7 @@ private:
   vector<bool> transformsValidity;
   set<string> availableTransforms;
   
+  vtkSmartPointer<vtkMatrix4x4> ImageToProbeTransform;
   vtkSmartPointer<vtkImageData> imgData;
   unsigned char* dataPointer;
   vtkMRMLScalarVolumeNode* imageNode;
@@ -86,7 +88,7 @@ private:
   int imageHeight;
   int currentFrame;
   int numberOfFrames;
-  bool transformOption;
+  bool applyTransforms;
   string playMode;
   
   QTextEdit* console;
@@ -107,6 +109,7 @@ public:
   GET(set<string>, availableTransforms, AvailableTransforms);
   GETSET(QTextEdit*, console, Console);
   GETSET(string, playMode, PlayMode);
+  GETSET(bool, applyTransforms, ApplyTransforms);
   void setMhaPath(string path);
   string getCurrentTransformStatus();
   void updateImage();

@@ -23,10 +23,95 @@ limitations under the License.
 // VTK includes
 #include <vtkNew.h>
 #include <vtkImageImport.h>
+#include <vtkTransform.h>
 
 // STD includes
 #include <cassert>
 #include <ctime>
+
+// vnl include
+#include <vnl/vnl_double_3.h>
+
+// ==============================================
+// Helpers - conversion functions
+// ==============================================
+vnl_matrix<double> convertVnlVectorToMatrix(const vnl_double_3& v)
+{
+  vnl_matrix<double> result(3,1);
+  result(0,0) = v[0];
+  result(1,0) = v[1];
+  result(2,0) = v[2];
+  return result;
+}
+
+vnl_double_3 convertVnlMatrixToVector(const vnl_matrix<double>& m)
+{
+  vnl_double_3 result;
+  if(m.rows()==1 && m.cols()==3) {
+    for(int i=0; i<3; i++)
+      result[i] = m(0,i);
+  }
+  else if(m.rows()==3 && m.cols()==1) {
+    for(int i=0; i<3; i++)
+      result[i] = m(i,0);
+  }
+  return result;
+}
+
+vnl_double_3 arrayToVnlDouble(double arr[4])
+{
+  vnl_double_3 result;
+  result[0]=arr[0];
+  result[1]=arr[1];
+  result[2]=arr[2];
+  return result;
+}
+
+void vnlToArrayDouble(vnl_double_3 v, double arr[4])
+{
+  arr[0]=v[0];
+  arr[1]=v[1];
+  arr[2]=v[2];
+  arr[3]=1.0;
+}
+
+std::vector<float> vtkToStdMatrix(vtkMatrix4x4* matrix)
+{
+  std::vector<float> result;
+  for(int i=0; i<3; i++)
+  {
+    for(int j=0; j<4; j++)
+      result.push_back(matrix->GetElement(i,j));
+  }
+
+  return result;
+}
+
+void vnlToVtkMatrix(const vnl_matrix<double> vnlMatrix , vtkMatrix4x4* vtkMatrix)
+{
+  vtkMatrix->Identity();
+  int rows = vnlMatrix.rows();
+  int cols = vnlMatrix.cols();
+  if(rows > 4)
+    rows = 4;
+  if(cols > 4)
+    cols = 4;
+  for(int i=0; i<rows; i++)
+  {
+    for(int j=0; j<cols; j++)
+      vtkMatrix->SetElement(i,j,vnlMatrix(i,j));
+  }
+}
+
+void getVtkMatrixFromVector(const std::vector<float>& vec, vtkMatrix4x4* vtkMatrix)
+{
+  vtkMatrix->Identity();
+  if(vec.size() < 12)
+    return;
+  for(int i=0; i<3; i++)
+    for(int j=0; j<4; j++)
+    vtkMatrix->SetElement(i,j,vec[i*4+j]);
+}
 
 // =======================================================
 // Reading functions
@@ -214,8 +299,24 @@ vtkSlicerSimpleMhaReaderLogic::vtkSlicerSimpleMhaReaderLogic()
   this->imageWidth = 0;
   this->imageHeight = 0;
   this->numberOfFrames = 0;
-  this->transformOption = false;
+  this->applyTransforms = false;
   this->playMode = "Forwards";
+  
+  // Initialize Image to Probe transform
+  this->ImageToProbeTransform = vtkSmartPointer<vtkMatrix4x4>::New();
+  this->ImageToProbeTransform->Identity();
+  this->ImageToProbeTransform->SetElement(0,0,0.107535);
+  this->ImageToProbeTransform->SetElement(0,1,0.00094824);
+  this->ImageToProbeTransform->SetElement(0,2,0.0044213);
+  this->ImageToProbeTransform->SetElement(0,3,-65.9013);
+  this->ImageToProbeTransform->SetElement(1,0,0.0044901);
+  this->ImageToProbeTransform->SetElement(1,1,-0.00238041);
+  this->ImageToProbeTransform->SetElement(1,2,-0.106347);
+  this->ImageToProbeTransform->SetElement(1,3,-3.05698);
+  this->ImageToProbeTransform->SetElement(2,0,-0.000844189);
+  this->ImageToProbeTransform->SetElement(2,1,0.105271);
+  this->ImageToProbeTransform->SetElement(2,2,-0.00244457);
+  this->ImageToProbeTransform->SetElement(2,3,-17.1613);
 }
 
 //----------------------------------------------------------------------------
@@ -323,6 +424,17 @@ void vtkSlicerSimpleMhaReaderLogic::updateImage()
   importer->SetDataExtentToWholeExtent();
   importer->Update();
   this->imgData = importer->GetOutput();
+  
+  if(this->transforms.size() > 0 && this->applyTransforms)
+  {
+    vtkSmartPointer<vtkMatrix4x4> transform = vtkSmartPointer<vtkMatrix4x4>::New();
+    vtkSmartPointer<vtkTransform> combinedTransform = vtkSmartPointer<vtkTransform>::New();
+    getVtkMatrixFromVector(this->transforms[this->currentFrame], transform);
+    combinedTransform->Concatenate(transform);
+    combinedTransform->Concatenate(this->ImageToProbeTransform);
+    vtkSmartPointer<vtkMatrix4x4> matrix = combinedTransform->GetMatrix();
+    this->imageNode->SetIJKToRASMatrix(matrix);
+  }
 
   endTime = clock();
   intervalInMiliSeconds = (endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;

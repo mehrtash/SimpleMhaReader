@@ -97,6 +97,7 @@ void qSlicerSimpleMhaReaderModuleWidget::setup()
   connect(d->timer, SIGNAL(timeout()), this, SLOT(onPlayNext()));
   connect(d->playIntervalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onPlayIntervalChanged(int)));
   connect(d->playModeComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(onPlayModeChanged(const QString&)));
+  connect(d->applyTransformsCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onApplyTransformsChanged(int)));
   
   connect(d->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(onFrameSliderChanged(int)));
   
@@ -165,6 +166,14 @@ void qSlicerSimpleMhaReaderModuleWidget::onPlayIntervalChanged(int value)
 void qSlicerSimpleMhaReaderModuleWidget::onPlayModeChanged(const QString& text){
   Q_D(qSlicerSimpleMhaReaderModuleWidget);
   d->logic()->setPlayMode(text.toStdString());
+}
+
+void qSlicerSimpleMhaReaderModuleWidget::onApplyTransformsChanged(int state){
+  Q_D(qSlicerSimpleMhaReaderModuleWidget);
+  if(state == Qt::Checked)
+    d->logic()->setApplyTransforms(true);
+  else if(state == Qt::Unchecked)
+    d->logic()->setApplyTransforms(false);
 }
 
 SLOTDEF_0(onPreviousImage, previousImage);
