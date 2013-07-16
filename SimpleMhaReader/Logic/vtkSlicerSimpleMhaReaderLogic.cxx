@@ -410,8 +410,8 @@ void vtkSlicerSimpleMhaReaderLogic::updateImage()
   readImage_mha();
 
   clock_t endTime = clock();
-  double intervalInMiliSeconds = (endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
-  oss << "(1): " << intervalInMiliSeconds << endl;
+  double intervalInMiliSeconds = (double)(endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
+  oss << "Reading took: " << intervalInMiliSeconds << " ms" << endl;
   this->console->insertPlainText(oss.str().c_str());
   oss.clear(); oss.str("");
   beginTime = endTime;
@@ -437,30 +437,21 @@ void vtkSlicerSimpleMhaReaderLogic::updateImage()
   }
 
   endTime = clock();
-  intervalInMiliSeconds = (endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
-  oss << "(2): " << intervalInMiliSeconds << endl;
+  intervalInMiliSeconds = (double)(endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
+  oss << "Importing to vtk took : " << intervalInMiliSeconds << " ms" << endl;
   this->console->insertPlainText(oss.str().c_str());
   oss.clear(); oss.str("");
   beginTime = endTime;
   
   this->imageNode->SetAndObserveImageData(this->imgData);
-
-  endTime = clock();
-  intervalInMiliSeconds = (endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
-  oss << "(3): " << intervalInMiliSeconds << endl;
-  this->console->insertPlainText(oss.str().c_str());
-  oss.clear(); oss.str("");
-  beginTime = endTime;
-
-
   if(this->GetMRMLScene()) {
     if(!this->GetMRMLScene()->IsNodePresent(this->imageNode))
       this->GetMRMLScene()->AddNode(this->imageNode);
   }
-
+  
   endTime = clock();
-  intervalInMiliSeconds = (endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
-  oss << "(2): " << intervalInMiliSeconds << endl;
+  intervalInMiliSeconds = (double)(endTime - beginTime)/(double) CLOCKS_PER_SEC * 1000;
+  oss << "Setting node's data took: " << intervalInMiliSeconds << " ms" << endl;
   this->console->insertPlainText(oss.str().c_str());
   oss.clear(); oss.str("");
   beginTime = endTime;

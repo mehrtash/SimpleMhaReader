@@ -141,7 +141,6 @@ void qSlicerSimpleMhaReaderModuleWidget::updateState()
 
 void qSlicerSimpleMhaReaderModuleWidget::onNextImage(){
   Q_D(qSlicerSimpleMhaReaderModuleWidget);
-  d->consoleTextEdit->insertPlainText("blue\n");
   d->logic()->nextImage();
 }
 
