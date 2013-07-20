@@ -111,6 +111,7 @@ public:
   GETSET(QTextEdit*, console, Console);
   GETSET(string, playMode, PlayMode);
   GETSET(bool, applyTransforms, ApplyTransforms);
+  void setImageToProbeTransform();
   void setMhaPath(string path);
   string getCurrentTransformStatus();
   void updateImage();

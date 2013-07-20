@@ -305,18 +305,18 @@ vtkSlicerSimpleMhaReaderLogic::vtkSlicerSimpleMhaReaderLogic()
   // Initialize Image to Probe transform
   this->ImageToProbeTransform = vtkSmartPointer<vtkMatrix4x4>::New();
   this->ImageToProbeTransform->Identity();
-  this->ImageToProbeTransform->SetElement(0,0,0.107535);
-  this->ImageToProbeTransform->SetElement(0,1,0.00094824);
-  this->ImageToProbeTransform->SetElement(0,2,0.0044213);
-  this->ImageToProbeTransform->SetElement(0,3,-65.9013);
-  this->ImageToProbeTransform->SetElement(1,0,0.0044901);
-  this->ImageToProbeTransform->SetElement(1,1,-0.00238041);
-  this->ImageToProbeTransform->SetElement(1,2,-0.106347);
-  this->ImageToProbeTransform->SetElement(1,3,-3.05698);
-  this->ImageToProbeTransform->SetElement(2,0,-0.000844189);
-  this->ImageToProbeTransform->SetElement(2,1,0.105271);
-  this->ImageToProbeTransform->SetElement(2,2,-0.00244457);
-  this->ImageToProbeTransform->SetElement(2,3,-17.1613);
+  // this->ImageToProbeTransform->SetElement(0,0,0.107535);
+  //   this->ImageToProbeTransform->SetElement(0,1,0.00094824);
+  //   this->ImageToProbeTransform->SetElement(0,2,0.0044213);
+  //   this->ImageToProbeTransform->SetElement(0,3,-65.9013);
+  //   this->ImageToProbeTransform->SetElement(1,0,0.0044901);
+  //   this->ImageToProbeTransform->SetElement(1,1,-0.00238041);
+  //   this->ImageToProbeTransform->SetElement(1,2,-0.106347);
+  //   this->ImageToProbeTransform->SetElement(1,3,-3.05698);
+  //   this->ImageToProbeTransform->SetElement(2,0,-0.000844189);
+  //   this->ImageToProbeTransform->SetElement(2,1,0.105271);
+  //   this->ImageToProbeTransform->SetElement(2,2,-0.00244457);
+  //   this->ImageToProbeTransform->SetElement(2,3,-17.1613);
 }
 
 //----------------------------------------------------------------------------
@@ -379,6 +379,7 @@ void vtkSlicerSimpleMhaReaderLogic::setMhaPath(string path)
     int iImgCount = -1;
     if(readImageDimensions_mha(this->mhaPath, iImgCols, iImgRows, iImgCount))
       return;
+    this->setImageToProbeTransform();
     this->imageWidth = iImgCols;
     this->imageHeight = iImgRows;
     this->numberOfFrames = iImgCount;
@@ -573,4 +574,40 @@ void vtkSlicerSimpleMhaReaderLogic::setTransformToIdentity()
     matrix->Identity();
     this->imageNode->SetIJKToRASMatrix(matrix);
   }
+}
+
+void vtkSlicerSimpleMhaReaderLogic::setImageToProbeTransform()
+{
+  this->ImageToProbeTransform->Identity();
+  if(this->imageWidth == 1280 && this->imageHeight == 1024) {
+    this->ImageToProbeTransform->SetElement(0,0,9.4);
+    this->ImageToProbeTransform->SetElement(0,1,0);
+    this->ImageToProbeTransform->SetElement(0,2,0);
+    this->ImageToProbeTransform->SetElement(0,3,613);
+    this->ImageToProbeTransform->SetElement(1,0,0);
+    this->ImageToProbeTransform->SetElement(1,1,0);
+    this->ImageToProbeTransform->SetElement(1,2,9.4);
+    this->ImageToProbeTransform->SetElement(1,3,165);
+    this->ImageToProbeTransform->SetElement(2,0,0);
+    this->ImageToProbeTransform->SetElement(2,1,-9.4);
+    this->ImageToProbeTransform->SetElement(2,2,0);
+    this->ImageToProbeTransform->SetElement(2,3,0);
+    
+    
+  }
+  else if(this->imageWidth == 1920 && this->imageHeight == 1200) {
+    this->ImageToProbeTransform->SetElement(0,0,11);
+    this->ImageToProbeTransform->SetElement(0,1,0);
+    this->ImageToProbeTransform->SetElement(0,2,0);
+    this->ImageToProbeTransform->SetElement(0,3,934);
+    this->ImageToProbeTransform->SetElement(1,0,0);
+    this->ImageToProbeTransform->SetElement(1,1,0);
+    this->ImageToProbeTransform->SetElement(1,2,11);
+    this->ImageToProbeTransform->SetElement(1,3,194);
+    this->ImageToProbeTransform->SetElement(2,0,0);
+    this->ImageToProbeTransform->SetElement(2,1,-11);
+    this->ImageToProbeTransform->SetElement(2,2,0);
+    this->ImageToProbeTransform->SetElement(2,3,0);
+  }
+  this->ImageToProbeTransform->Invert();
 }
