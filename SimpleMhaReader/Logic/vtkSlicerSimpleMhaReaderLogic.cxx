@@ -379,10 +379,10 @@ void vtkSlicerSimpleMhaReaderLogic::setMhaPath(string path)
     int iImgCount = -1;
     if(readImageDimensions_mha(this->mhaPath, iImgCols, iImgRows, iImgCount))
       return;
-    this->setImageToProbeTransform();
     this->imageWidth = iImgCols;
     this->imageHeight = iImgRows;
     this->numberOfFrames = iImgCount;
+    this->setImageToProbeTransform();
     if(this->dataPointer)
       delete [] this->dataPointer;
     this->dataPointer = new unsigned char[iImgRows*iImgCols];
@@ -583,11 +583,11 @@ void vtkSlicerSimpleMhaReaderLogic::setImageToProbeTransform()
     this->ImageToProbeTransform->SetElement(0,0,9.4);
     this->ImageToProbeTransform->SetElement(0,1,0);
     this->ImageToProbeTransform->SetElement(0,2,0);
-    this->ImageToProbeTransform->SetElement(0,3,613);
+    this->ImageToProbeTransform->SetElement(0,3,613.);
     this->ImageToProbeTransform->SetElement(1,0,0);
     this->ImageToProbeTransform->SetElement(1,1,0);
     this->ImageToProbeTransform->SetElement(1,2,9.4);
-    this->ImageToProbeTransform->SetElement(1,3,165);
+    this->ImageToProbeTransform->SetElement(1,3,165.);
     this->ImageToProbeTransform->SetElement(2,0,0);
     this->ImageToProbeTransform->SetElement(2,1,-9.4);
     this->ImageToProbeTransform->SetElement(2,2,0);
@@ -596,18 +596,31 @@ void vtkSlicerSimpleMhaReaderLogic::setImageToProbeTransform()
     
   }
   else if(this->imageWidth == 1920 && this->imageHeight == 1200) {
-    this->ImageToProbeTransform->SetElement(0,0,11);
-    this->ImageToProbeTransform->SetElement(0,1,0);
-    this->ImageToProbeTransform->SetElement(0,2,0);
-    this->ImageToProbeTransform->SetElement(0,3,934);
-    this->ImageToProbeTransform->SetElement(1,0,0);
-    this->ImageToProbeTransform->SetElement(1,1,0);
+    this->ImageToProbeTransform->SetElement(0,0,11.);
+    this->ImageToProbeTransform->SetElement(0,1,0.);
+    this->ImageToProbeTransform->SetElement(0,2,0.);
+    this->ImageToProbeTransform->SetElement(0,3,934.);
+    this->ImageToProbeTransform->SetElement(1,0,0.);
+    this->ImageToProbeTransform->SetElement(1,1,0.);
     this->ImageToProbeTransform->SetElement(1,2,11);
-    this->ImageToProbeTransform->SetElement(1,3,194);
-    this->ImageToProbeTransform->SetElement(2,0,0);
-    this->ImageToProbeTransform->SetElement(2,1,-11);
-    this->ImageToProbeTransform->SetElement(2,2,0);
-    this->ImageToProbeTransform->SetElement(2,3,0);
+    this->ImageToProbeTransform->SetElement(1,3,194.);
+    this->ImageToProbeTransform->SetElement(2,0,0.);
+    this->ImageToProbeTransform->SetElement(2,1,-11.);
+    this->ImageToProbeTransform->SetElement(2,2,0.);
+    this->ImageToProbeTransform->SetElement(2,3,0.);
   }
   this->ImageToProbeTransform->Invert();
+  this->printImageToProbeTransform();
+}
+
+void vtkSlicerSimpleMhaReaderLogic::printImageToProbeTransform()
+{
+  for(int i=0; i<4; i++) {
+    ostringstream oss;
+    for(int j=0; j<4; j++){
+      oss <<this->ImageToProbeTransform->GetElement(i,j) << " ";
+    }
+    oss << "\n";
+    this->console->insertPlainText(oss.str().c_str());
+  }
 }

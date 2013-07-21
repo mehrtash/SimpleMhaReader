@@ -72,8 +72,10 @@ private:
 
   vtkSlicerSimpleMhaReaderLogic(const vtkSlicerSimpleMhaReaderLogic&); // Not implemented
   void operator=(const vtkSlicerSimpleMhaReaderLogic&);               // Not implemented
+  void printImageToProbeTransform();
   
   // Attributes
+public:
   string mhaPath;
   vector<vector<float> > transforms;
   vector<string> filenames;
@@ -108,6 +110,7 @@ public:
   GET(int, currentFrame, CurrentFrame);
   GET(int, numberOfFrames, NumberOfFrames);
   GET(set<string>, availableTransforms, AvailableTransforms);
+  GET(vtkMatrix4x4*, ImageToProbeTransform, ImageToProbeTransform);
   GETSET(QTextEdit*, console, Console);
   GETSET(string, playMode, PlayMode);
   GETSET(bool, applyTransforms, ApplyTransforms);
