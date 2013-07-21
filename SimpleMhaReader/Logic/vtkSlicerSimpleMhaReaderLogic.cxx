@@ -362,13 +362,11 @@ void vtkSlicerSimpleMhaReaderLogic::ProcessMRMLNodesEvents( vtkObject* caller, u
   {
     return;
   }
-  this->console->insertPlainText("dog");
   if(event == vtkMRMLTransformableNode::TransformModifiedEvent) {
-    this->console->insertPlainText("cat");
     vtkMRMLLinearTransformNode* tnode = vtkMRMLLinearTransformNode::SafeDownCast(caller);
     if(!tnode)
       return;
-    this->console->insertPlainText("changed transform");
+    this->console->insertPlainText("Changed Transform\n");
     this->updateImage();
   }
   else
@@ -388,7 +386,6 @@ void vtkSlicerSimpleMhaReaderLogic
 
 void vtkSlicerSimpleMhaReaderLogic::setMhaPath(string path)
 {
-  this->console->insertPlainText("red\n");
   if(path != this->mhaPath){
     this->mhaPath = path;
     this->transforms.clear();
