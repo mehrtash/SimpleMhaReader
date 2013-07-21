@@ -29,6 +29,7 @@
 
 // MRML includes
 #include <vtkMRMLScalarVolumeNode.h>
+#include <vtkMRMLLinearTransformNode.h>
 
 // STD includes
 #include <cstdlib>
@@ -68,11 +69,12 @@ protected:
   virtual void UpdateFromMRMLScene();
   virtual void OnMRMLSceneNodeAdded(vtkMRMLNode* node);
   virtual void OnMRMLSceneNodeRemoved(vtkMRMLNode* node);
+  virtual void ProcessMRMLNodesEvents( vtkObject* caller, unsigned long event, void * callData );
 private:
 
   vtkSlicerSimpleMhaReaderLogic(const vtkSlicerSimpleMhaReaderLogic&); // Not implemented
   void operator=(const vtkSlicerSimpleMhaReaderLogic&);               // Not implemented
-  void printImageToProbeTransform();
+  void printUSToImageTransform();
   
   // Attributes
 public:
@@ -82,7 +84,8 @@ public:
   vector<bool> transformsValidity;
   set<string> availableTransforms;
   
-  vtkSmartPointer<vtkMatrix4x4> ImageToProbeTransform;
+  vtkMRMLLinearTransformNode* USToImageTransformNode;
+  vtkSmartPointer<vtkMatrix4x4> USToImageTransform;
   vtkSmartPointer<vtkImageData> imgData;
   unsigned char* dataPointer;
   vtkMRMLScalarVolumeNode* imageNode;
@@ -102,6 +105,7 @@ public:
   // Read image logic
   void readImage_mha();
   void setTransformToIdentity();
+  void setApplyTransforms(bool);
   
   // Getters and Setters
   GET(string, mhaPath, MhaPath);
@@ -110,11 +114,11 @@ public:
   GET(int, currentFrame, CurrentFrame);
   GET(int, numberOfFrames, NumberOfFrames);
   GET(set<string>, availableTransforms, AvailableTransforms);
-  GET(vtkMatrix4x4*, ImageToProbeTransform, ImageToProbeTransform);
+  GET(vtkMatrix4x4*, USToImageTransform, USToImageTransform);
   GETSET(QTextEdit*, console, Console);
   GETSET(string, playMode, PlayMode);
-  GETSET(bool, applyTransforms, ApplyTransforms);
-  void setImageToProbeTransform();
+  GET(bool, applyTransforms, ApplyTransforms);
+  void setUSToImageTransform();
   void setMhaPath(string path);
   string getCurrentTransformStatus();
   void updateImage();

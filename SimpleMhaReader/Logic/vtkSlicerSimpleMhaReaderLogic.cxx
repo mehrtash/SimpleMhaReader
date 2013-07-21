@@ -303,20 +303,22 @@ vtkSlicerSimpleMhaReaderLogic::vtkSlicerSimpleMhaReaderLogic()
   this->playMode = "Forwards";
   
   // Initialize Image to Probe transform
-  this->ImageToProbeTransform = vtkSmartPointer<vtkMatrix4x4>::New();
-  this->ImageToProbeTransform->Identity();
-  // this->ImageToProbeTransform->SetElement(0,0,0.107535);
-  //   this->ImageToProbeTransform->SetElement(0,1,0.00094824);
-  //   this->ImageToProbeTransform->SetElement(0,2,0.0044213);
-  //   this->ImageToProbeTransform->SetElement(0,3,-65.9013);
-  //   this->ImageToProbeTransform->SetElement(1,0,0.0044901);
-  //   this->ImageToProbeTransform->SetElement(1,1,-0.00238041);
-  //   this->ImageToProbeTransform->SetElement(1,2,-0.106347);
-  //   this->ImageToProbeTransform->SetElement(1,3,-3.05698);
-  //   this->ImageToProbeTransform->SetElement(2,0,-0.000844189);
-  //   this->ImageToProbeTransform->SetElement(2,1,0.105271);
-  //   this->ImageToProbeTransform->SetElement(2,2,-0.00244457);
-  //   this->ImageToProbeTransform->SetElement(2,3,-17.1613);
+  this->USToImageTransformNode = vtkMRMLLinearTransformNode::New();
+  this->USToImageTransformNode->SetName("US to Image Transform");
+  this->USToImageTransform = vtkSmartPointer<vtkMatrix4x4>::New();
+  this->USToImageTransform->Identity();
+  // this->USToImageTransform->SetElement(0,0,0.107535);
+  //   this->USToImageTransform->SetElement(0,1,0.00094824);
+  //   this->USToImageTransform->SetElement(0,2,0.0044213);
+  //   this->USToImageTransform->SetElement(0,3,-65.9013);
+  //   this->USToImageTransform->SetElement(1,0,0.0044901);
+  //   this->USToImageTransform->SetElement(1,1,-0.00238041);
+  //   this->USToImageTransform->SetElement(1,2,-0.106347);
+  //   this->USToImageTransform->SetElement(1,3,-3.05698);
+  //   this->USToImageTransform->SetElement(2,0,-0.000844189);
+  //   this->USToImageTransform->SetElement(2,1,0.105271);
+  //   this->USToImageTransform->SetElement(2,2,-0.00244457);
+  //   this->USToImageTransform->SetElement(2,3,-17.1613);
 }
 
 //----------------------------------------------------------------------------
@@ -354,6 +356,25 @@ void vtkSlicerSimpleMhaReaderLogic::UpdateFromMRMLScene()
   assert(this->GetMRMLScene() != 0);
 }
 
+void vtkSlicerSimpleMhaReaderLogic::ProcessMRMLNodesEvents( vtkObject* caller, unsigned long event, void * callData )
+{
+  if ( caller == NULL )
+  {
+    return;
+  }
+  this->console->insertPlainText("dog");
+  if(event == vtkMRMLTransformableNode::TransformModifiedEvent) {
+    this->console->insertPlainText("cat");
+    vtkMRMLLinearTransformNode* tnode = vtkMRMLLinearTransformNode::SafeDownCast(caller);
+    if(!tnode)
+      return;
+    this->console->insertPlainText("changed transform");
+    this->updateImage();
+  }
+  else
+    this->Superclass::ProcessMRMLNodesEvents( caller, event, callData );
+}
+
 //---------------------------------------------------------------------------
 void vtkSlicerSimpleMhaReaderLogic::OnMRMLSceneNodeAdded(vtkMRMLNode* vtkNotUsed(node))
 {
@@ -382,7 +403,11 @@ void vtkSlicerSimpleMhaReaderLogic::setMhaPath(string path)
     this->imageWidth = iImgCols;
     this->imageHeight = iImgRows;
     this->numberOfFrames = iImgCount;
-    this->setImageToProbeTransform();
+    if(this->GetMRMLScene()) {
+      if(!this->GetMRMLScene()->IsNodePresent(this->USToImageTransformNode))
+        this->GetMRMLScene()->AddNode(this->USToImageTransformNode);
+    }
+    this->setUSToImageTransform();
     if(this->dataPointer)
       delete [] this->dataPointer;
     this->dataPointer = new unsigned char[iImgRows*iImgCols];
@@ -395,6 +420,8 @@ void vtkSlicerSimpleMhaReaderLogic::setMhaPath(string path)
 
 string vtkSlicerSimpleMhaReaderLogic::getCurrentTransformStatus()
 {
+  if(this->transformsValidity.size() == 0)
+    return "Unknown";
   if(this->transformsValidity[this->currentFrame])
     return "OK";
   else
@@ -430,10 +457,13 @@ void vtkSlicerSimpleMhaReaderLogic::updateImage()
   {
     vtkSmartPointer<vtkMatrix4x4> transform = vtkSmartPointer<vtkMatrix4x4>::New();
     vtkSmartPointer<vtkTransform> combinedTransform = vtkSmartPointer<vtkTransform>::New();
+    vtkSmartPointer<vtkMatrix4x4> imageToUSTransform = vtkSmartPointer<vtkMatrix4x4>::New();
+    vtkMatrix4x4::Invert(this->USToImageTransform, imageToUSTransform);
     getVtkMatrixFromVector(this->transforms[this->currentFrame], transform);
     combinedTransform->Concatenate(transform);
-    combinedTransform->Concatenate(this->ImageToProbeTransform);
+    combinedTransform->Concatenate(imageToUSTransform);
     vtkSmartPointer<vtkMatrix4x4> matrix = combinedTransform->GetMatrix();
+    // Makes a deep copy of the matrix
     this->imageNode->SetIJKToRASMatrix(matrix);
   }
 
@@ -576,51 +606,71 @@ void vtkSlicerSimpleMhaReaderLogic::setTransformToIdentity()
   }
 }
 
-void vtkSlicerSimpleMhaReaderLogic::setImageToProbeTransform()
+void vtkSlicerSimpleMhaReaderLogic::setUSToImageTransform()
 {
-  this->ImageToProbeTransform->Identity();
+  this->USToImageTransform->Identity();
   if(this->imageWidth == 1280 && this->imageHeight == 1024) {
-    this->ImageToProbeTransform->SetElement(0,0,9.4);
-    this->ImageToProbeTransform->SetElement(0,1,0);
-    this->ImageToProbeTransform->SetElement(0,2,0);
-    this->ImageToProbeTransform->SetElement(0,3,613.);
-    this->ImageToProbeTransform->SetElement(1,0,0);
-    this->ImageToProbeTransform->SetElement(1,1,0);
-    this->ImageToProbeTransform->SetElement(1,2,9.4);
-    this->ImageToProbeTransform->SetElement(1,3,165.);
-    this->ImageToProbeTransform->SetElement(2,0,0);
-    this->ImageToProbeTransform->SetElement(2,1,-9.4);
-    this->ImageToProbeTransform->SetElement(2,2,0);
-    this->ImageToProbeTransform->SetElement(2,3,0);
+    this->USToImageTransform->SetElement(0,0,9.4);
+    this->USToImageTransform->SetElement(0,1,0);
+    this->USToImageTransform->SetElement(0,2,0);
+    this->USToImageTransform->SetElement(0,3,613.);
+    this->USToImageTransform->SetElement(1,0,0);
+    this->USToImageTransform->SetElement(1,1,0);
+    this->USToImageTransform->SetElement(1,2,9.4);
+    this->USToImageTransform->SetElement(1,3,165.);
+    this->USToImageTransform->SetElement(2,0,0);
+    this->USToImageTransform->SetElement(2,1,-9.4);
+    this->USToImageTransform->SetElement(2,2,0);
+    this->USToImageTransform->SetElement(2,3,0);
     
     
   }
   else if(this->imageWidth == 1920 && this->imageHeight == 1200) {
-    this->ImageToProbeTransform->SetElement(0,0,11.);
-    this->ImageToProbeTransform->SetElement(0,1,0.);
-    this->ImageToProbeTransform->SetElement(0,2,0.);
-    this->ImageToProbeTransform->SetElement(0,3,934.);
-    this->ImageToProbeTransform->SetElement(1,0,0.);
-    this->ImageToProbeTransform->SetElement(1,1,0.);
-    this->ImageToProbeTransform->SetElement(1,2,11);
-    this->ImageToProbeTransform->SetElement(1,3,194.);
-    this->ImageToProbeTransform->SetElement(2,0,0.);
-    this->ImageToProbeTransform->SetElement(2,1,-11.);
-    this->ImageToProbeTransform->SetElement(2,2,0.);
-    this->ImageToProbeTransform->SetElement(2,3,0.);
+    this->USToImageTransform->SetElement(0,0,11);
+    this->USToImageTransform->SetElement(0,1,0.);
+    this->USToImageTransform->SetElement(0,2,0.);
+    this->USToImageTransform->SetElement(0,3,932);
+    this->USToImageTransform->SetElement(1,0,0.);
+    this->USToImageTransform->SetElement(1,1,0.);
+    this->USToImageTransform->SetElement(1,2,11);
+    this->USToImageTransform->SetElement(1,3,172.);
+    this->USToImageTransform->SetElement(2,0,0.);
+    this->USToImageTransform->SetElement(2,1,-11);
+    this->USToImageTransform->SetElement(2,2,0.);
+    this->USToImageTransform->SetElement(2,3,0.);
   }
-  this->ImageToProbeTransform->Invert();
-  this->printImageToProbeTransform();
+  
+  this->USToImageTransformNode->SetAndObserveMatrixTransformToParent(this->USToImageTransform);
+  
+  int wasModifying = this->StartModify();
+  vtkMRMLLinearTransformNode* newNode = NULL;
+  vtkSmartPointer< vtkIntArray > events = vtkSmartPointer< vtkIntArray >::New();
+  events->InsertNextValue( vtkMRMLTransformableNode::TransformModifiedEvent );
+  vtkSetAndObserveMRMLNodeEventsMacro( newNode, this->USToImageTransformNode, events );
+  this->USToImageTransformNode = newNode;
+  this->EndModify( wasModifying );
+  
+  this->printUSToImageTransform();
 }
 
-void vtkSlicerSimpleMhaReaderLogic::printImageToProbeTransform()
+void vtkSlicerSimpleMhaReaderLogic::printUSToImageTransform()
 {
   for(int i=0; i<4; i++) {
     ostringstream oss;
     for(int j=0; j<4; j++){
-      oss <<this->ImageToProbeTransform->GetElement(i,j) << " ";
+      oss <<this->USToImageTransform->GetElement(i,j) << " ";
     }
     oss << "\n";
     this->console->insertPlainText(oss.str().c_str());
   }
+}
+
+void vtkSlicerSimpleMhaReaderLogic::setApplyTransforms(bool value)
+{
+  if(value != this->applyTransforms) {
+    this->applyTransforms = value;
+    this->updateImage();
+  }
+  this->applyTransforms = value;
+  
 }
