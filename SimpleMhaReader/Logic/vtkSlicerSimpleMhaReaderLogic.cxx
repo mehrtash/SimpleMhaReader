@@ -607,19 +607,47 @@ void vtkSlicerSimpleMhaReaderLogic::setUSToImageTransform()
 {
   this->USToImageTransform->Identity();
   if(this->imageWidth == 1280 && this->imageHeight == 1024) {
-    this->USToImageTransform->SetElement(0,0,9.4);
-    this->USToImageTransform->SetElement(0,1,0);
-    this->USToImageTransform->SetElement(0,2,0);
-    this->USToImageTransform->SetElement(0,3,613.);
-    this->USToImageTransform->SetElement(1,0,0);
-    this->USToImageTransform->SetElement(1,1,0);
-    this->USToImageTransform->SetElement(1,2,9.4);
-    this->USToImageTransform->SetElement(1,3,165.);
-    this->USToImageTransform->SetElement(2,0,0);
-    this->USToImageTransform->SetElement(2,1,-9.4);
-    this->USToImageTransform->SetElement(2,2,0);
-    this->USToImageTransform->SetElement(2,3,0);
-    
+    // Transform as calculated by Andras
+    //this->USToImageTransform->SetElement(0,0,9.4);
+    //this->USToImageTransform->SetElement(0,1,0);
+    //this->USToImageTransform->SetElement(0,2,0);
+    //this->USToImageTransform->SetElement(0,3,613.);
+    //this->USToImageTransform->SetElement(1,0,0);
+    //this->USToImageTransform->SetElement(1,1,0);
+    //this->USToImageTransform->SetElement(1,2,9.4);
+    //this->USToImageTransform->SetElement(1,3,165.);
+    //this->USToImageTransform->SetElement(2,0,0);
+    //this->USToImageTransform->SetElement(2,1,-9.4);
+    //this->USToImageTransform->SetElement(2,2,0);
+    //this->USToImageTransform->SetElement(2,3,0);
+
+    // transform as calculated by me...
+    //this->USToImageTransform->SetElement(0,0,9.4);
+    //this->USToImageTransform->SetElement(0,1,0);
+    //this->USToImageTransform->SetElement(0,2,0);
+    //this->USToImageTransform->SetElement(0,3,612.);
+    //this->USToImageTransform->SetElement(1,0,0);
+    //this->USToImageTransform->SetElement(1,1,0);
+    //this->USToImageTransform->SetElement(1,2,9.4);
+    //this->USToImageTransform->SetElement(1,3,150.);
+    //this->USToImageTransform->SetElement(2,0,0);
+    //this->USToImageTransform->SetElement(2,1,-9.4);
+    //this->USToImageTransform->SetElement(2,2,0);
+    //this->USToImageTransform->SetElement(2,3,0);
+
+    // transform as calculated by Plus...
+    this->USToImageTransform->SetElement(0,0,9.2825);
+    this->USToImageTransform->SetElement(0,1,0.38763);
+    this->USToImageTransform->SetElement(0,2,-0.074848);
+    this->USToImageTransform->SetElement(0,3,611.63);
+    this->USToImageTransform->SetElement(1,0,0.083496);
+    this->USToImageTransform->SetElement(1,1,-0.21476);
+    this->USToImageTransform->SetElement(1,2,9.4937);
+    this->USToImageTransform->SetElement(1,3,167.77);
+    this->USToImageTransform->SetElement(2,0,0.39005);
+    this->USToImageTransform->SetElement(2,1,-9.382);
+    this->USToImageTransform->SetElement(2,2,-0.21566);
+    this->USToImageTransform->SetElement(2,3,-6.6768);
     
   }
   else if(this->imageWidth == 1920 && this->imageHeight == 1200) {
