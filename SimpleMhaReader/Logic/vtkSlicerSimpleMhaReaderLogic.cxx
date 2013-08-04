@@ -24,6 +24,7 @@ limitations under the License.
 #include <vtkNew.h>
 #include <vtkImageImport.h>
 #include <vtkTransform.h>
+#include <vtkPngWriter.h>
 
 // STD includes
 #include <cassert>
@@ -409,6 +410,10 @@ void vtkSlicerSimpleMhaReaderLogic::setMhaPath(string path)
       delete [] this->dataPointer;
     this->dataPointer = new unsigned char[iImgRows*iImgCols];
     readImageTransforms_mha(this->mhaPath, this->transforms, this->availableTransforms, this->transformsValidity, this->filenames);
+    std::ostringstream oss;
+    oss << "Number of transforms found: " << this->transforms.size() << endl;
+    oss << "Number of transform validity: " << this->transformsValidity.size() <<endl;
+    this->console->insertPlainText(oss.str().c_str());
     this->updateImage();
     this->Modified();
   }
@@ -698,4 +703,19 @@ void vtkSlicerSimpleMhaReaderLogic::setApplyTransforms(bool value)
   }
   this->applyTransforms = value;
   
+}
+
+string vtkSlicerSimpleMhaReaderLogic::getMhaPath()
+{
+  return this->mhaPath;
+}
+
+void vtkSlicerSimpleMhaReaderLogic::saveToPng(const std::string filepath)
+{
+  if(!this->imgData)
+    return;
+  vtkSmartPointer<vtkPNGWriter> writer =vtkSmartPointer<vtkPNGWriter>::New();
+  writer->SetFileName(filepath.c_str());
+  writer->SetInput(this->imgData);
+  writer->Write();
 }

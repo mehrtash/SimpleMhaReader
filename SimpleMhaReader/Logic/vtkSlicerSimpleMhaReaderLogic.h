@@ -75,9 +75,10 @@ private:
   vtkSlicerSimpleMhaReaderLogic(const vtkSlicerSimpleMhaReaderLogic&); // Not implemented
   void operator=(const vtkSlicerSimpleMhaReaderLogic&);               // Not implemented
   void printUSToImageTransform();
+  void checkFrame();
   
   // Attributes
-public:
+private:
   string mhaPath;
   vector<vector<float> > transforms;
   vector<string> filenames;
@@ -98,26 +99,11 @@ public:
   
   QTextEdit* console;
   
-  
-  // Private function
-  void checkFrame();
 public:
   // Read image logic
   void readImage_mha();
   void setTransformToIdentity();
   void setApplyTransforms(bool);
-  
-  // Getters and Setters
-  GET(string, mhaPath, MhaPath);
-  GET(int, imageWidth, ImageWidth);
-  GET(int, imageHeight, ImageHeight);
-  GET(int, currentFrame, CurrentFrame);
-  GET(int, numberOfFrames, NumberOfFrames);
-  GET(set<string>, availableTransforms, AvailableTransforms);
-  GET(vtkMatrix4x4*, USToImageTransform, USToImageTransform);
-  GETSET(QTextEdit*, console, Console);
-  GETSET(string, playMode, PlayMode);
-  GET(bool, applyTransforms, ApplyTransforms);
   void setUSToImageTransform();
   void setMhaPath(string path);
   string getCurrentTransformStatus();
@@ -131,6 +117,20 @@ public:
   void randomFrame();
   void previousImage();
   void playNext();
+  void saveToPng(const std::string filepath);
+  
+  // Getters and Setters
+  string getMhaPath();
+  GET(int, imageWidth, ImageWidth);
+  GET(int, imageHeight, ImageHeight);
+  GET(int, currentFrame, CurrentFrame);
+  GET(int, numberOfFrames, NumberOfFrames);
+  GET(set<string>, availableTransforms, AvailableTransforms);
+  GET(vtkMatrix4x4*, USToImageTransform, USToImageTransform);
+  GETSET(QTextEdit*, console, Console);
+  GETSET(string, playMode, PlayMode);
+  GET(bool, applyTransforms, ApplyTransforms);
+  
 };
 
 #endif

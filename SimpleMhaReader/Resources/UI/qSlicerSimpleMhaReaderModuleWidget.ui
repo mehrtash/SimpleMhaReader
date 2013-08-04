@@ -243,6 +243,13 @@
     </layout>
    </item>
    <item>
+    <widget class="QPushButton" name="saveToPngButton">
+     <property name="text">
+      <string>Save to PNG</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QTextEdit" name="consoleTextEdit"/>
    </item>
    <item>

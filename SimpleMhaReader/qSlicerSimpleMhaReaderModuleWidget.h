@@ -53,6 +53,7 @@ public slots:
   void onPlayModeChanged(const QString&);
   void onPlayNext();
   void onApplyTransformsChanged(int);
+  void onSaveToPng();
 
 protected:
   QScopedPointer<qSlicerSimpleMhaReaderModuleWidgetPrivate> d_ptr;

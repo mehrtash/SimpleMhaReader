@@ -18,6 +18,7 @@
 // Qt includes
 #include <QDebug>
 #include <QTimer>
+#include <QFileDialog>
 
 // SlicerQt includes
 #include "qSlicerSimpleMhaReaderModuleWidget.h"
@@ -98,6 +99,7 @@ void qSlicerSimpleMhaReaderModuleWidget::setup()
   connect(d->playIntervalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onPlayIntervalChanged(int)));
   connect(d->playModeComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(onPlayModeChanged(const QString&)));
   connect(d->applyTransformsCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onApplyTransformsChanged(int)));
+  connect(d->saveToPngButton, SIGNAL(clicked()), this, SLOT(onSaveToPng()));
   
   connect(d->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(onFrameSliderChanged(int)));
   
@@ -175,6 +177,15 @@ void qSlicerSimpleMhaReaderModuleWidget::onApplyTransformsChanged(int state){
     d->logic()->setTransformToIdentity();
     d->logic()->setApplyTransforms(false);
   }
+}
+
+void qSlicerSimpleMhaReaderModuleWidget::onSaveToPng()
+{
+  Q_D(qSlicerSimpleMhaReaderModuleWidget);
+  //get a filename to open
+  QString fileName = QFileDialog::getSaveFileName(this, tr("Open Image"), "/home/doriad", tr("Image Files (*.png *.jpg *.bmp)"));
+  d->logic()->saveToPng(fileName.toStdString());
+
 }
 
 SLOTDEF_0(onPreviousImage, previousImage);
